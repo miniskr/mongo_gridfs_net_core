@@ -1,9 +1,12 @@
 ﻿using HCVisionFiles.Services;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
+using MongoDB.Driver.GridFS;
 using System;
+using System.Collections;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace HCVisionFiles.Controllers
 {
@@ -67,6 +70,13 @@ namespace HCVisionFiles.Controllers
         public string Test()
         {
             return "success";
+        }
+
+        [HttpGet]
+        [Route("list")]
+        public async Task<IEnumerable<GridFSFileInfo>> GetFileListAsync([FromQuery]string fileName)
+        {
+            return await this._fileService.GetFileListAsync(fileName);
         }
     }
 }

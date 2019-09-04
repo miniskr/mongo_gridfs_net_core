@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver.GridFS;
 using MongoDB.Bson;
+using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace HCVisionFiles.Services
 {
@@ -48,6 +50,19 @@ namespace HCVisionFiles.Services
             await this._bucket.DeleteAsync(id);
 
             return id.ToString();
+        }
+
+        public async Task<IEnumerable<GridFSFileInfo>> GetFileListAsync(string fileName)
+        {
+            var filters = Builders<GridFSFileInfo>.Filter.Empty;
+
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                var filter = Builders<GridFSFileInfo>.Filter.Regex(x => x.Filename, new Regex($"{Regex.Escape(fileName)}", RegexOptions.IgnoreCase));
+                filters = Builders<GridFSFileInfo>.Filter.And(filter, filters);
+            }
+
+            return await this._bucket.FindAsync(filters).GetAwaiter().GetResult().ToListAsync();
         }
     }
 }
